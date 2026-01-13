@@ -20,6 +20,8 @@ ridgeHeight = ballRadius*1.5;
 ridgeSlack = 0.4;
 
 topThickness = 5;
+topGrooveThickness = 3;
+topGrooveCount = 200;
 topRadius = 195/2;
 topRidgeThickness = 2;
 topRidgeJut = ridgeThickness - topRidgeThickness;
@@ -73,12 +75,23 @@ module topRidge(r) {
     ]);
 }
 
+function pol(r, a) = [r*cos(a), r*sin(a)];
+
 module top() {
-    translate([0, 0, thickness + ballRadius*2 + 0.8]) cylinder(h = topThickness, r = topRadius);
+    translate([0, 0, thickness + ballRadius*2 + 0.8 + topGrooveThickness])
+        cylinder(h = topThickness-topGrooveThickness, r = topRadius);
+    lowRadius = topRadius - (2 * PI * topRadius)/topGrooveCount;
+    points = [
+        for (i = [0 : topGrooveCount-1])
+            pol((i % 2 == 1) ? topRadius : lowRadius, 360*i/topGrooveCount)
+    ];
+    translate([0, 0, thickness + ballRadius*2 + 0.8])
+        linear_extrude(height = topThickness + 0.01)
+        polygon(points);
 }
 
-base();
+//base();
 //balls(ballCount);
 top();
-topRidge(loopRadius-ballRadius-ridgeSlack/2-ridgeThickness*1.5-0.8);
-topRidge(loopRadius+ballRadius+ridgeSlack/2+ridgeThickness*1.5+0.8);
+topRidge(loopRadius-ballRadius-ridgeSlack/2-ridgeThickness*1.5-0.4);
+topRidge(loopRadius+ballRadius+ridgeSlack/2+ridgeThickness*1.5+0.4);
