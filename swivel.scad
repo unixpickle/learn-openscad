@@ -27,6 +27,9 @@ topRidgeThickness = 2;
 topRidgeJut = ridgeThickness - topRidgeThickness;
 topRidgeHeight = ballRadius;
 
+backdropThickness = 5;
+backdropHeight = 150;
+
 module ridge(r) {
     translate([0, 0, 0.0001]) difference() {
         cylinder(h = thickness + ridgeHeight, r = r+ridgeThickness/2);
@@ -78,7 +81,7 @@ module topRidge(r) {
 function pol(r, a) = [r*cos(a), r*sin(a)];
 
 module top() {
-    translate([0, 0, thickness + ballRadius*2 + 0.8 + topGrooveThickness])
+    translate([0, 0, thickness + ballRadius*2 + 0.2 + topGrooveThickness])
         cylinder(h = topThickness-topGrooveThickness, r = topRadius);
     lowRadius = topRadius - (2 * PI * topRadius)/topGrooveCount;
     points = [
@@ -90,8 +93,25 @@ module top() {
         polygon(points);
 }
 
+module peg() {
+    rotate_extrude() polygon([[0, 0], [3, 0], [5, 2], [5, 20], [0, 25]]);
+}
+
+module backdrop() {
+    difference() {
+        translate([0, 0, 20]) cylinder(h=backdropHeight, r=topSize/2+backdropThickness/2-10);
+        cylinder(h=backdropHeight+100, r=topSize/2-backdropThickness/2-10);
+        cube([topSize/2, topSize/2, backdropHeight+100]);
+    }
+    translate([topSize/2-10, -(topSize-20)/9/2, 0]) peg();
+    translate([-topSize/2+10, -(topSize-20)/9/2, 0]) peg();
+    translate([-(topSize-20)/9/2, -topSize/2+10, 0]) peg();
+    translate([-(topSize-20)/9/2, topSize/2-10, 0]) peg();
+}
+
 //base();
 //balls(ballCount);
-top();
-topRidge(loopRadius-ballRadius-ridgeSlack/2-ridgeThickness*1.5-0.4);
-topRidge(loopRadius+ballRadius+ridgeSlack/2+ridgeThickness*1.5+0.4);
+//top();
+//topRidge(loopRadius-ballRadius-ridgeSlack/2-ridgeThickness*1.5-0.4);
+//topRidge(loopRadius+ballRadius+ridgeSlack/2+ridgeThickness*1.5+0.4);
+backdrop();
