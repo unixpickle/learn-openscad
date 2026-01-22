@@ -1,38 +1,36 @@
-module clip() {
-    layerHeight = 0.2;
-    topLayers = 6;
-    width = 20;
-    length = 10;
+clipHoleRadius = 5;
+clipHoleFn = 80;
 
-    translate([length - 0.3, 0, 6.5]) cube([3, width, 7], center=true);
-    translate([length - 0.3, 0, 10]) rotate([0, 45, 0]) cube([4, width, 4], center=true);
-
+module sanderBody() {
     difference() {
-        translate([0, width/2]) rotate([90, 0, 0]) linear_extrude(width, convexity=2) polygon([
-            [0, 0],
-            [3, 0],
-            [3, 3],
-            [length, 3],
-            [length+3, 0],
-            [length+4, 1],
-            [length+2-topLayers*layerHeight, 3+topLayers*layerHeight],
-            [-1, 3+topLayers*layerHeight],
-            [-1, 0],
-        ]);
-        translate([20, 0, 0]) cube([20, width-1, 2.9], center=true);
+        minkowski() {
+            cylinder(h=1.1, r=50, center=true, $fn=190);
+            sphere(r=2.5, $fn=30);
+        }
+
+        for (i = [0, 90, 180, 270]) {
+            rotate([0, 0, i]) translate([32, 0, 0]) cylinder(h=100, r=clipHoleRadius, $fn=clipHoleFn);
+        }
+    }
+
+    // Hex key to stick into screwdriver
+    screwSize = 4;
+    linear_extrude(40) polygon([for (i = [0:6]) [cos(i*360/6)*screwSize, sin(i*360/6)*screwSize]]);
+    cylinder(h=10, r=10);
+}
+
+module clipPlug() {
+    rotate([180, 0, 0]) {
+        // Small hole for the peg
+        cylinder(h=2.5001, r=clipHoleRadius, $fn=clipHoleFn);
+        
+        // A divoted larger handle that can be printed without supports.
+        translate([0, 0, 2.5]) linear_extrude(clipHoleRadius*1.5, scale=2.0) circle(r=clipHoleRadius, $fn=clipHoleFn);
+        translate([0, 0, clipHoleRadius*1.5+2.5]) rotate([180, 0, 0]) linear_extrude(clipHoleRadius*1.5, scale=2.0) circle(r=clipHoleRadius, $fn=clipHoleFn);
     }
 }
 
-translate([0, 0, -2]) minkowski() {
-    cylinder(h=1.1, r=50, center=true, $fn=190);
-    sphere(r=2.5, $fn=30);
-}
+sanderBody();
 
-for (i = [0, 90, 180, 270]) {
-    rotate([0, 0, i]) translate([30, 0, 0]) clip();
-}
+//clipPlug();
 
-// Hex key to stick into screwdriver
-screwSize = 3;
-linear_extrude(40) polygon([for (i = [0:6]) [cos(i*360/6)*screwSize, sin(i*360/6)*screwSize]]);
-cylinder(h=10, r=10);
