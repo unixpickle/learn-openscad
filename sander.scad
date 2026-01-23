@@ -20,17 +20,18 @@ module sanderBody() {
 }
 
 module clipPlug() {
+    bigRadius = clipHoleRadius * 1.5 * 2;
     rotate([180, 0, 0]) {
         // Small hole for the peg
         cylinder(h=2.5001, r=clipHoleRadius, $fn=clipHoleFn);
         
         // A divoted larger handle that can be printed without supports.
-        translate([0, 0, 2.5]) linear_extrude(clipHoleRadius*1.5, scale=2.0) circle(r=clipHoleRadius, $fn=clipHoleFn);
-        translate([0, 0, clipHoleRadius*1.5+2.5]) rotate([180, 0, 0]) linear_extrude(clipHoleRadius*1.5, scale=2.0) circle(r=clipHoleRadius, $fn=clipHoleFn);
+        translate([0, 0, 2.5]) linear_extrude(bigRadius, scale=2.0) circle(r=bigRadius/2, $fn=clipHoleFn);
+        translate([0, 0, bigRadius+2.5]) rotate([180, 0, 0]) linear_extrude(bigRadius, scale=2.0) circle(r=bigRadius/2, $fn=clipHoleFn);
     }
 }
 
-sanderBody();
+//sanderBody();
 
-//clipPlug();
+clipPlug();
 
